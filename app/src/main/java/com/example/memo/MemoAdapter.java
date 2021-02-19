@@ -1,6 +1,6 @@
 package com.example.memo;
 
-import android.app.Activity;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -21,20 +20,12 @@ import static android.content.ContentValues.TAG;
 public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.CustomViewHolder> {
     private ArrayList<MainData> arrayList;
     private OnItemClick mCallback;
+
     public MemoAdapter(ArrayList<MainData> arrayList,OnItemClick listener){
         this.arrayList = arrayList;
         this.mCallback = listener;
     }
 
-    public void listclick(int position){
-        int i = 0;
-        while(true){
-            if(i == position){
-                break;
-            }
-            i++;
-        }
-    }
 
     @NonNull
     @Override
@@ -47,14 +38,19 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.CustomViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MemoAdapter.CustomViewHolder holder, int position) {
+
         holder.title.setText(arrayList.get(position).getTitle());
         holder.content.setText(arrayList.get(position).getContent());
 
         holder.itemView.setTag(position);
         Log.i(TAG, "onBindViewHolder: "+position);
+
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mCallback.onClick(holder.getAdapterPosition());
+                Log.i(TAG, "onClick: "+ holder.getAdapterPosition());
                 String title = holder.title.getText().toString();
                 Toast.makeText(v.getContext(), title, Toast.LENGTH_SHORT).show();
             }
