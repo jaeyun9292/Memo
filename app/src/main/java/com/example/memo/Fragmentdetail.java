@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
 public class Fragmentdetail extends Fragment {
     Context context;
     MainActivity activity;
-    int position;
+    String title;
 
     public Fragmentdetail(){}
 
@@ -41,14 +41,14 @@ public class Fragmentdetail extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle bundle = activity.bundle;
-        position = bundle.getInt("position");
+        title = bundle.getString("title");
 
         View v = inflater.inflate(R.layout.memo_detail_fragment, container, false);
 
         InputStream in = null;
         BufferedReader reader;
         try{
-            in = context.openFileInput("memo"+position);
+            in = context.openFileInput(title);
         }catch (Exception e){e.printStackTrace();}
 
 
@@ -71,7 +71,7 @@ public class Fragmentdetail extends Fragment {
         EditText editText = activity.findViewById(R.id.detail);
         String s = editText.getText().toString();
         try {
-            OutputStream out = context.openFileOutput("memo"+position, Context.MODE_PRIVATE);
+            OutputStream out = context.openFileOutput(title, Context.MODE_PRIVATE);
             PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
             writer.append(s);
             writer.close();

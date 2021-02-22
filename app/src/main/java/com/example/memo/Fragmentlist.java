@@ -1,6 +1,7 @@
 package com.example.memo;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -13,13 +14,15 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -30,8 +33,8 @@ public class Fragmentlist extends Fragment implements OnItemClick{
     private LinearLayoutManager linearLayoutManager;
     Context context;
     MainActivity activity;
-
-    int write;
+    int count;
+    String title;
 
     public Fragmentlist(){}
 
@@ -48,8 +51,7 @@ public class Fragmentlist extends Fragment implements OnItemClick{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.i("onCreateView: ","!!!!!");
-
+        Log.i("onCreateView: ","111111111111111");
         View view = inflater.inflate(R.layout.memo_list_fragment, container, false);
         recyclerView = view.findViewById(R.id.rv);
         linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -57,42 +59,60 @@ public class Fragmentlist extends Fragment implements OnItemClick{
 
         SharedPreferences sp;
         sp = context.getSharedPreferences("memo",MODE_PRIVATE);
-        int count = sp.getInt("count",0);
-
         SharedPreferences.Editor editor = sp.edit();
-        Button btn_add = (Button)activity.findViewById(R.id.btn_add);
-        btn_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (int i = 0; i <= count; i++) {
-                    if(count == i){
-                        write = i+1;
-                        editor.putString("memotitle"+i,"제목"+write);
-                        editor.putString("memocontent"+i,"내용"+write);
-                        editor.putInt("count", i+1);
-                        editor.commit();
+        count = sp.getInt("count",1);
 
-                        MainData mainData = new MainData("제목"+write,"내용"+write);
-                        arrayList.add(mainData);
-                        memoAdapter.notifyDataSetChanged();
-                    }
-                }
+        for (int i = 1; i <= count; i++) {
+            String title = sp.getString(String.valueOf(i),"");
+            if(!title.equals("")) {
+                MainData mainData = new MainData(title);
+                arrayList.add(mainData);
             }
-        });
-
-
-        for (int i = 0; i <count; i++) {
-            String title = sp.getString("memotitle"+i,"");
-            String content = sp.getString("memocontent"+i,"");
-            MainData mainData = new MainData(title, content);
-            arrayList.add(mainData);
         }
-
-
-
 
         memoAdapter = new MemoAdapter(arrayList, this);
         recyclerView.setAdapter(memoAdapter);
+
+
+        FloatingActionButton btn_add = (FloatingActionButton) activity.findViewById(R.id.btn_add);
+        btn_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder ad = new AlertDialog.Builder(context);
+                ad.setTitle("제목");       // 제목 설정
+
+                // EditText 삽입하기
+                final EditText et = new EditText(context);
+                if (et.getParent() != null)
+                    ((ViewGroup) et.getParent()).removeView(et);
+                ad.setView(et);
+
+                // 확인 버튼 설정
+                ad.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        count = sp.getInt("count",1);
+                        editor.putInt("count",count+1);
+                        String title = et.getText().toString();
+                        editor.putString(String.valueOf(count),title);
+                        editor.commit();
+                        MainData mainData = new MainData(title);
+                        arrayList.add(mainData);
+                        memoAdapter.notifyDataSetChanged();
+                        dialog.dismiss();     //닫기
+                    }
+                });
+
+                // 취소 버튼 설정
+                ad.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();     //닫기
+                    }
+                });
+                ad.show();
+            }
+        });
 
         return view;
     }
@@ -106,8 +126,10 @@ public class Fragmentlist extends Fragment implements OnItemClick{
 
     @Override
     public void onClick(int position) {
+        MainData mainData = arrayList.get(position);
+        title = mainData.getTitle();
         Bundle bundle = new Bundle();
-        bundle.putInt("position",position);
+        bundle.putString("title",title);
         activity.fragBtnClick(bundle);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -115,6 +137,29 @@ public class Fragmentlist extends Fragment implements OnItemClick{
         transaction.replace(R.id.memofragment,fragmentdetail);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void longClick(int position) {
+        MainData mainData = arrayList.get(position);
+        title = mainData.getTitle();
+        Log.i("longClick: ",title);
+
+        SharedPreferences sp;
+        sp = context.getSharedPreferences("memo",MODE_PRIVATE);
+
+        String a;
+        int i = 0;
+        while (true){
+            i++;
+            a = sp.getString(String.valueOf(i),"");
+            if(a.equals(title)){break;}
+        }
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove(String.valueOf(i));
+        editor.commit();
+        context.deleteFile(title);
     }
 
 

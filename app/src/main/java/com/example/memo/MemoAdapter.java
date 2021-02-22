@@ -1,5 +1,6 @@
 package com.example.memo;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +41,6 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.CustomViewHold
     public void onBindViewHolder(@NonNull MemoAdapter.CustomViewHolder holder, int position) {
 
         holder.title.setText(arrayList.get(position).getTitle());
-        holder.content.setText(arrayList.get(position).getContent());
 
         holder.itemView.setTag(position);
         Log.i(TAG, "onBindViewHolder: "+position);
@@ -59,6 +59,7 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.CustomViewHold
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                mCallback.longClick(holder.getAdapterPosition());
                 remove(position);
                 return true;
             }
@@ -68,6 +69,7 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.CustomViewHold
     public void remove(int position){
         arrayList.remove(position);
         notifyItemRemoved(position);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -77,12 +79,10 @@ public class MemoAdapter extends RecyclerView.Adapter<MemoAdapter.CustomViewHold
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
         protected TextView title;
-        protected TextView content;
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
             this.title = (TextView) itemView.findViewById(R.id.tv_title);
-            this.content = (TextView) itemView.findViewById(R.id.tv_content);
         }
     }
 }
