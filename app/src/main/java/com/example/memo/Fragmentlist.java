@@ -74,7 +74,7 @@ public class Fragmentlist extends Fragment implements OnItemClick{
         recyclerView.setAdapter(memoAdapter);
 
 
-        FloatingActionButton btn_add = (FloatingActionButton) activity.findViewById(R.id.btn_add);
+        FloatingActionButton btn_add = (FloatingActionButton) view.findViewById(R.id.btn_add);
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,7 +93,7 @@ public class Fragmentlist extends Fragment implements OnItemClick{
                     public void onClick(DialogInterface dialog, int which) {
                         count = sp.getInt("count",1);
                         editor.putInt("count",count+1);
-                        String title = et.getText().toString();
+                        String title = " "+et.getText().toString();
                         editor.putString(String.valueOf(count),title);
                         editor.commit();
                         MainData mainData = new MainData(title);
@@ -132,11 +132,9 @@ public class Fragmentlist extends Fragment implements OnItemClick{
         bundle.putString("title",title);
         activity.fragBtnClick(bundle);
 
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
         Fragmentdetail fragmentdetail = new Fragmentdetail();
-        transaction.replace(R.id.memofragment,fragmentdetail);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        activity.replaceFragment(fragmentdetail);
     }
 
     @Override
