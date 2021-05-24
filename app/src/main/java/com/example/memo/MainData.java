@@ -15,4 +15,3 @@ public class MainData {
         this.title = title;
     }
 }
-

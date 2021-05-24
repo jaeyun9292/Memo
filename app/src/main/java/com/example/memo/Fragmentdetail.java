@@ -2,12 +2,10 @@ package com.example.memo;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,14 +25,15 @@ public class Fragmentdetail extends Fragment {
     MainActivity activity;
     String title;
 
-    public Fragmentdetail(){}
+    public Fragmentdetail() {
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {            //프래그먼트와 액티비티가 연결될때 호출되는 메소드
         super.onAttach(context);
         this.context = context;
 
-        activity = (MainActivity)getActivity();
+        activity = (MainActivity) getActivity();
     }
 
     @Nullable
@@ -47,22 +46,26 @@ public class Fragmentdetail extends Fragment {
 
         InputStream in = null;
         BufferedReader reader;
-        try{
+        try {
             in = context.openFileInput(title);
-        }catch (Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         EditText editText = v.findViewById(R.id.detail);
 
-        try{
+        try {
             reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String s;
-            while ((s = reader.readLine())!=null){
+            while ((s = reader.readLine()) != null) {
                 editText.append(s);
             }
-        }catch (Exception e){e.printStackTrace();}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        return  v;
+        return v;
     }
 
     @Override
